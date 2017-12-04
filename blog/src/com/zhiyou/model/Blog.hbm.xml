@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generated 2017-11-22 16:10:08 by Hibernate Tools 5.2.3.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="true" default-access="property" default-cascade="none" default-lazy="true">
+    <class catalog="blogs" dynamic-insert="false" dynamic-update="false" mutable="true" name="com.zhiyou.model.Blog" optimistic-lock="version" polymorphism="implicit" select-before-update="false" table="blog">
+        <id name="id" type="java.lang.Integer">
+            <column name="id"/>
+            <generator class="identity"/>
+        </id>
+        <many-to-one class="com.zhiyou.model.Blogtype" cascade="all" embed-xml="true" fetch="select" insert="true" name="blogtype" not-found="exception" optimistic-lock="true" unique="false" update="true">
+            <column name="blogTypeId"/>
+        </many-to-one>
+        <many-to-one class="com.zhiyou.model.User" cascade="all"  embed-xml="true" fetch="select" insert="true" name="user" not-found="exception" optimistic-lock="true" unique="false" update="true">
+            <column name="userId" not-null="true"/>
+        </many-to-one>
+      
+        <property generated="never" lazy="false" name="title" optimistic-lock="true" type="string" unique="false">
+            <column name="title"/>
+        </property>
+        <property generated="never" lazy="false" name="content" optimistic-lock="true" type="string" unique="false">
+            <column length="65535" name="content"/>
+        </property>
+        <property generated="never" lazy="false" name="insertTime" optimistic-lock="true" type="date" unique="false">
+            <column length="19" name="insertTime"/>
+        </property>
+        <property generated="never" lazy="false" name="insertUser" optimistic-lock="true" type="string" unique="false">
+            <column length="50" name="insertUser"/>
+        </property>
+        <property generated="never" lazy="false" name="updateTime" optimistic-lock="true" type="date" unique="false">
+            <column length="19" name="updateTime"/>
+        </property>
+        <property generated="never" lazy="false" name="views" optimistic-lock="true" type="java.lang.Integer" unique="false">
+            <column name="views"/>
+        </property>
+    </class>
+</hibernate-mapping>

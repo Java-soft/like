@@ -1,0 +1,65 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: zhouyc
+  Date: 2017/4/26
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<!DOCTYPE html>
+<html>
+<head>
+	<base href="<%=basePath%>">
+	<meta charset="UTF-8">
+	<title>用户首页</title>
+	<%@ include file="../include/styles.jsp"%>
+</head>
+<body>
+<jsp:include  page="header.jsp"></jsp:include>
+
+<div class="container">
+	<div class="row">
+		<div class="col-xs-9" id="datasDiv">
+
+		</div>
+		<div class="col-xs-3">
+			<ul class="nav  nav-pills nav-stacked">
+				<li role="presentation" class="active btype" datatype="news"><a href="javascript:void(0);">最新博文</a></li>
+				<li role="presentation" class="btype" datatype="hot"><a href="javascript:void(0);">最热博文</a></li>
+			</ul>
+		</div>
+
+	</div>
+</div>
+
+<%@ include file="../include/scripts.jsp"%>
+<script src="${pageContext.request.contextPath}/static/scripts/highcharts.js"></script>
+<script src="${pageContext.request.contextPath}/static/scripts/highcharts-zh_CN.js"></script>
+ <script>
+	$(function () {
+
+		$('.btype').click(function () {
+			if(!$(this).hasClass('active')){
+				$('.btype').each(function (i) {
+					if($(this).hasClass('active')){
+						$(this).removeClass('active');
+					}
+				});
+				$(this).addClass('active');
+			}
+
+			var type = $(this).attr('datatype');
+			//加载数据
+			$('#datasDiv').load('view/queryData.do?type='+type);
+
+		});
+
+		//默认加载最新数据
+		$('#datasDiv').load('view/queryData.do?type=news');
+	});
+</script>
+</body>
+</html>

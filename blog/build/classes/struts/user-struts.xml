@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 约束文件 -->
+ <!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+	"http://struts.apache.org/dtds/struts-2.5.dtd">
+	<struts>
+	 <constant name="struts.convention.package.locators" value="com" />
+	<!-- 整理归类 -->
+	
+	<constant name="struts.devMode" value="true"></constant><!-- 开发者模式  name
+	常量名  value 常量值 -->
+	<package name="user"  extends="struts-default">
+
+
+	</package>
+	<package name="blog" extends="json-default"></package>
+	<package name="blogtype" extends="json-default">
+	
+	
+	</package>
+	<package name="blogviews" extends="json-default"></package>
+	</struts>

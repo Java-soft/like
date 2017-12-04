@@ -1,0 +1,191 @@
+package com.zhiyou.action;
+
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Resource;
+import javax.jws.soap.SOAPBinding.Use;
+
+import org.apache.jasper.tagplugins.jstl.core.ForEach;
+import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.Result;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+import com.opensymphony.xwork2.ModelDriven;
+import com.opensymphony.xwork2.util.ValueStack;
+
+import com.zhiyou.model.Blog;
+import com.zhiyou.model.Blogtype;
+import com.zhiyou.model.User;
+import com.zhiyou.service.BlogService;
+import com.zhiyou.service.BlogTypeService;
+import com.zhiyou.service.UserService;
+
+@Namespace("/blog")
+@Controller("blogAction")
+@Scope("prototype")
+@ParentPackage(value = "blog")
+
+public class BlogAction extends ActionSupport implements ModelDriven<Blog> {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private Blog blog = new Blog();
+	private int idd;
+	private int blogTypeId;
+	@Resource
+	private BlogService blogService;
+	@Resource
+	private BlogTypeService blogTypeService;
+	@Resource
+	private UserService userService;
+
+	@Action(value = "selectById", results = { @Result(name = "input", location = "update.jsp") })
+	public String selectById() {
+		Integer id = idd;
+		ServletActionContext.getRequest().getSession().setAttribute("rr", id);
+		Blog blogs = blogService.selectbyId(id);
+		List<Blogtype> blogtype = blogTypeService.findall();
+		ValueStack vs = ActionContext.getContext().getValueStack();
+		vs.set("types", blogtype);
+		vs.set("blogInfo", blogs);
+		return INPUT;
+	}
+
+	@Action(value = "update", results = { @Result(name = "success", type = "chain", location = "findById") })
+	public String update() {
+
+		Blog blogs = blogService
+				.selectbyId((Integer) ServletActionContext.getRequest().getSession().getAttribute("rr"));
+
+		blogs.setTitle(blog.getTitle());
+		blogs.setContent(blog.getContent());
+		blogs.setBlogtype(blogTypeService.selectbyId(blog.getBlogTypeId()));// *********
+		blogService.update(blogs);
+		return "success";
+	}
+
+	@Action(value = "Tz1", results = { @Result(name = "input", location = "create.jsp") })
+	public String Tz1() {
+		User user = userService.selectbyId((Integer) ServletActionContext.getRequest().getSession().getAttribute("id"));
+		List<Blogtype> blogtype = blogTypeService.findall();
+		ValueStack vs = ActionContext.getContext().getValueStack();
+		vs.set("types", blogtype);
+
+		vs.set("_USER_MODEL", user);
+
+		return INPUT;
+
+	}
+
+	@Action(value = "add", results = { @Result(name = "input", type = "chain", location = "findById") })
+	public String add() {
+
+		blog.setBlogtype(blogTypeService.selectbyId(blog.getBlogTypeId()));
+		blog.setUser(
+				userService.selectbyId((Integer) ServletActionContext.getRequest().getSession().getAttribute("id")));
+		blogService.add(blog);
+		return INPUT;
+
+	}
+
+	@Action(value = "delete", results = { @Result(name = "input", type = "chain", location = "findById") })
+	public String delete() {
+
+		blogService.delete(idd);
+
+		return INPUT;
+
+	}
+	@Action(value = "index", results = { @Result(name = "input", location = "view/info.jsp") })
+	public String index(){
+		
+	     List<Blog>blogs1= blogService.findall();
+	     
+	     for (Blog blog : blogs1) {
+	    	ValueStack vs=ActionContext.getContext().getValueStack();
+	    	vs.set("blogInfo", blog);
+		}
+		
+		return INPUT;
+		
+	}
+
+	@Action(value = "admin", results = { @Result(name = "input", location = "info.jsp") })
+	public String admin() {
+
+		User user1 = userService
+				.selectbyId((Integer) ServletActionContext.getRequest().getSession().getAttribute("id"));
+
+		Set<Blog> set = user1.getBlogs();
+		for (Blog blog : set) {
+			Integer xInteger = blog.getId();
+
+			Blog blog2 = blogService.selectbyId(xInteger);
+
+			ValueStack vs = ActionContext.getContext().getValueStack();
+
+			vs.set("_USER_MODEL", user1);
+			vs.set("blogInfo", blog2);
+		}
+
+		return INPUT;
+
+	}
+
+	public int getIdd() {
+		return idd;
+	}
+
+	public void setIdd(int idd) {
+		this.idd = idd;
+	}
+
+	public UserService getUserService() {
+		return userService;
+	}
+
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+
+	public BlogTypeService getBlogTypeService() {
+		return blogTypeService;
+	}
+
+	public void setBlogTypeService(BlogTypeService blogTypeService) {
+		this.blogTypeService = blogTypeService;
+	}
+
+	public BlogService getBlogService() {
+		return blogService;
+	}
+
+	public void setBlogService(BlogService blogService) {
+		this.blogService = blogService;
+	}
+
+	@Override
+	public Blog getModel() {
+		// TODO Auto-generated method stub
+		return blog;
+	}
+
+	public int getBlogTypeId() {
+		return blogTypeId;
+	}
+
+	public void setBlogTypeId(int blogTypeId) {
+		this.blogTypeId = blogTypeId;
+	}
+
+}

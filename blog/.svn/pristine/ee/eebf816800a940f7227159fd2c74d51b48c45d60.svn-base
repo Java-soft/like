@@ -1,0 +1,181 @@
+package com.zhiyou.dao.impl;
+
+import java.lang.reflect.ParameterizedType;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.management.Query;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
+import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+
+import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import com.sun.jmx.snmp.Timestamp;
+import com.zhiyou.dao.BaseDao;
+import com.zhiyou.model.Blog;
+import com.zhiyou.model.Blogtype;
+import com.zhiyou.model.User;
+
+import freemarker.template.SimpleDate;
+import javafx.scene.chart.PieChart.Data;
+
+public class BaseDaoImpl<T> extends HibernateDaoSupport implements BaseDao<T> {
+
+	private Class<T> clazz;
+
+	public BaseDaoImpl() {
+		// 根据反射获取T的Class对象
+		Class<?> c = this.getClass();
+		ParameterizedType pt = (ParameterizedType) c.getGenericSuperclass();
+		Type[] types = pt.getActualTypeArguments();
+		clazz = (Class<T>) types[0];
+	}
+
+	@Resource
+	public void setSessionFactory0(SessionFactory sessionFactory) {
+		super.setSessionFactory(sessionFactory);
+	}
+
+	@Override
+	public void add(T t) {
+		// TODO Auto-generated method stub
+		getHibernateTemplate().save(t);
+	
+	}
+
+	@Override
+	public List<T> findById(Integer id) {
+		// TODO Auto-generated method stub
+
+		return (List<T>) getSessionFactory().getCurrentSession().get(clazz, id);
+	}
+
+	@Override
+	public List<T> findall() {
+		// TODO Auto-generated method stub
+		System.out.println(clazz.getName());
+		return getSessionFactory().getCurrentSession().createQuery("from " + clazz.getName()).list();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<T> selectbyemail(String email) {
+
+		return (List<T>) getHibernateTemplate().execute(new HibernateCallback<List<T>>() {
+
+			@Override
+			public List<T> doInHibernate(Session session) throws HibernateException {
+				// TODO Auto-generated method stub
+				String hql = "from User u where u.email =:email";
+				List<User> list = session.createQuery(hql).setParameter("email", email).list();
+				return (List<T>) list;
+			}
+		});
+	}
+
+	@Override
+	public T selectbyId(Integer id) {
+
+		// TODO Auto-generated method stub
+		return (T) getSessionFactory().getCurrentSession().get(clazz, id);
+
+	}@Override
+	 public void delete(int id){
+	 String hql="delete "+clazz.getName()+" p where p.id =?";
+		 getSessionFactory().getCurrentSession().createQuery(hql).setInteger(0, id).executeUpdate();
+		
+		
+		 }
+
+	@Override
+	public void update(T t) {
+		// TODO Auto-generated method stub
+		
+		this.getHibernateTemplate().update(t);
+	}
+
+	@Override
+	public List<T> selectBId(T id) {
+		// TODO Auto-generated method stub
+		
+		String hql="from  "+clazz.getName()+" p where p.id=?";
+		return (List<T>) getSessionFactory().getCurrentSession().createQuery(hql).setParameter("id", id).list();
+	}
+
+
+	@Override
+	public List<T> selectMhcx(String date, String date2, String title) {
+		// TODO Auto-generated method stub
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+	    Date a = null;
+	    Date b = null;
+	   
+		try {
+			a = sdf.parse(date);
+			
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	  
+		try {
+			b = sdf.parse(date2);
+			
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+				
+      String hql="from Blogtype b where b.insertTime>=? and b.updateTime<=? and b.title like :title";
+		return getSessionFactory().getCurrentSession().createQuery(hql).setParameter(0, a).setParameter(1, b).setParameter("title", "%"+title+"%").list();
+	}
+
+	@Override
+	public List<T> mhcxofall(String title, String date, String date2, Blogtype blogtypeIdS) {
+		// TODO Auto-generated method stub
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+	    Date a = null;
+	    Date b = null;
+	   
+		try {
+			a = sdf.parse(date);
+			
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	  
+		try {
+			b = sdf.parse(date2);
+			
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String hql="from Blog b where b.insertTime>=? and b.updateTime<=? and b.blogtype=? and b.title like :title ";
+		
+		return getSessionFactory().getCurrentSession().createQuery(hql).setParameter(0, a).setParameter(1, b).setParameter(2, blogtypeIdS).setParameter("title","%"+title+"%").list();
+	}
+
+	@Override
+	public List<T> mhcx(String title, Blogtype blogtype) {
+		// TODO Auto-generated method stub
+		
+		
+String hql="from Blog b where b.blogtype=? and b.title like :title ";
+		
+		return getSessionFactory().getCurrentSession().createQuery(hql).setParameter(0, blogtype).setParameter("title","%"+title+"%").list();
+	}
+
+
+	
+	
+}

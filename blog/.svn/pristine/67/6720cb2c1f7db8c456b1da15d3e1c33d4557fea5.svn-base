@@ -1,0 +1,48 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: zhouyc
+  Date: 2017/4/27
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<div class="row">
+	<c:if test="${!empty datas}">
+		<c:forEach items="${datas}" var="data">
+			<div class="media">
+				<div class="media-left  media-middle">
+					<a href="view/${data.id}/info.do">
+						<c:if test="${not empty data.avatar}">
+						<img class="media-object" src="${data.avatar}" alt="${data.insertUser}" width="64px" height="64px">
+						</c:if>
+						<c:if test="${empty data.avatar}">
+							<img class="media-object" src="${pageContext.request.contextPath}/static/images/avatar.jpg" alt="${data.insertUser}" width="64px" height="64px">
+						</c:if>
+					</a>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">
+						<a href="view/info.do?blogId=${data.id}" title="点击查看博客详情">${data.title}</a>
+					</h4>
+					<p>
+						<c:if test="${fn:length(data.content)<=200}">
+							${data.content}
+						</c:if>
+						<c:if test="${fn:length(data.content)>200}">
+							${fn:substring(data.content,0,199)}
+						</c:if>
+
+					</p>
+					<div class="text-right">作者：${data.insertUser}&nbsp;发表于：<fmt:formatDate value="${data.insertTime}" pattern="yyyy-MM-dd HH:mm"></fmt:formatDate>
+					&nbsp;分类：${data.btTitle}</div>
+				</div>
+			</div>
+		</c:forEach>
+
+	</c:if>
+	<c:if test="${empty datas}">
+		<h2>sorry，暂无更新数据</h2>
+	</c:if>
+</div>

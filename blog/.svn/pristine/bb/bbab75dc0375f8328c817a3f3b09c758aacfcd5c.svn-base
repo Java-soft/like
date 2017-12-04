@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="GBK"?>
+<!-- 约束文件 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+            http://www.springframework.org/schema/tx 
+            http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+    		 http://www.springframework.org/schema/aop 
+     		http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+           ">
+	<!-- 把jdbc.properties引入到applicationContext.xml文件里 -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<value>classpath:spring/jdbc.properties</value>
+		</property>
+	</bean>
+<context:component-scan base-package="com."></context:component-scan>
+	 <context:annotation-config/>
+	<!-- 配置dataSourcde -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+
+
+
+
+
+	<!-- 引入sessionFactory LocalSessionFactoryBean 即使用于hibernate也适用于spring -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<!-- <property name="configLocation"> <value>classpath:hibernate.cfg.xml</value> 
+			</property> -->
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="mappingDirectoryLocations">
+			<list>
+				<value>classpath:com/zhiyou/model</value>
+			</list>
+		</property>
+		   <property name="packagesToScan">  
+            <list>  
+                <value>com.zhiyou.*</value>  
+            </list>  
+        </property>  
+		<property name="hibernateProperties">
+			<props>
+
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+			</props>
+		</property>
+	</bean>
+
+<!-- 	<import resource="user-spring.xml"/> -->
+<import resource="transaction-spring2.xml"/>
+</beans>

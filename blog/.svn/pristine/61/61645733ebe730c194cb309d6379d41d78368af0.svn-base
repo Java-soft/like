@@ -1,0 +1,128 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: zhouyc
+  Date: 2017/4/25
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<!DOCTYPE html>
+<html>
+<head>
+	<base href="<%=basePath%>">
+	<meta charset="UTF-8">
+	<title>博客列表</title>
+	<%@ include file="../include/styles.jsp"%>
+</head>
+<body>
+<jsp:include  page="../include/header.jsp"></jsp:include>
+
+<div class="container">
+	<div class="row">
+		<div class="col-xs-9">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					博客信息管理
+				</div>
+				<div class="panel-body">
+					<form class="form-inline" action="blog/queryList.do" method="post" id="queryPageForm">
+						<input type="hidden" id="queryPageNum" name="pageNum" value="${queryInfo.pageNum}">
+						<div class="form-group">
+							<label for="queryTitle">标题</label>
+							<input type="text" class="form-control" name="queryTitle" id="queryTitle" placeholder="标题" value="${queryInfo.queryTitle}">
+
+						</div>
+						<div class="form-group">
+							<label for="blogTypeId" class="control-label">分类</label>
+							<select class="form-control" name="blogTypeId" id="blogTypeId">
+								<option value="0">博客分类</option>
+								<c:if test="${not empty types}">
+									<c:forEach items="${types}" var="type">
+										<option value="${type.id}"  <c:if test="${queryInfo.blogTypeId==type.id}">selected</c:if>>${type.title}</option>
+									</c:forEach>
+								</c:if>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="queryStartTime">发布时间从</label>
+							<input type="text" class="form-control" name="startTime" id="queryStartTime" placeholder="yyyy-mm-dd" value="${queryInfo.startTime }">
+						</div>
+						<div class="form-group">
+							<label for="queryEndTime">到</label>
+							<input type="text" class="form-control" name="endTime" id="queryEndTime" placeholder="yyyy-mm-dd" value="${queryInfo.endTime }">
+						</div>
+
+						<button type="submit" class="btn btn-default">查询</button>
+					</form>
+					<br>
+					<%--放置列表内容的--%>
+					<table class="table table-hover table-bordered">
+						<tr>
+							<th>序号</th>
+							 <th>标题</th>  
+							<th>分类</th>
+							<th>作者</th>
+							<th>发表时间</th>
+							<th>更新时间</th>
+							<th>操作</th>
+						</tr>
+						<tbody>
+							<c:if test="${not empty pageInfo}">
+								<c:forEach items="${pageInfo}" var="blog" varStatus="status">
+									<tr>
+										<td>${status.index+1}</td>
+										<td><a href="blog/info.do?blogId=${blog.id}" title="点击查看博客详情">${blog.title}</a></td>
+									  <td>${blog.blogtype.title}</td> 
+										<td>${blog.insertUser}</td>
+										<td><fmt:formatDate value="${blog.insertTime}" pattern="yyyy-MM-dd HH:mm"></fmt:formatDate></td>
+										<td><fmt:formatDate value="${blog.updateTime}" pattern="yyyy-MM-dd HH:mm"></fmt:formatDate></td>
+										<td>
+											<a href="blog/selectById.action?idd=${blog.id}" title="编辑博客内容">编辑</a>
+											<a href="blog/delete.action?idd=${blog.id}" <%-- onclick="return deleteBlog('${blog.id}');" --%> title="删除博客">删除</a>
+										</td>
+									</tr>
+								</c:forEach>
+							</c:if>
+						</tbody>
+					</table>
+				<%-- 	<jsp:include page="../include/page.jsp"></jsp:include> --%>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-3">
+			<jsp:include page="../include/right.jsp"></jsp:include>
+		</div>
+	</div>
+</div>
+
+
+<%@ include file="../include/scripts.jsp"%>
+<script>
+	$('#queryStartTime').datetimepicker({format: 'yyyy-mm-dd',minView:'month'});
+	$('#queryEndTime').datetimepicker({format: 'yyyy-mm-dd',minView:'month'});
+	function deleteBlog(id){
+		$.getJSON('blog/delete.action?blogId='+id,function(data){
+			if(data.success){
+				alert('删除博客成功');
+				location.reload();
+			}else{
+				alert(data.message);
+			}
+		});
+		return false;
+	}
+
+	function goPage(page){
+		$('#queryPageNum').val(page);
+		$('#queryPageForm').submit();
+
+		return false;
+	}
+</script>
+</body>
+</html>
